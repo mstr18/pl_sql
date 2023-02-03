@@ -1,3 +1,5 @@
+--procedure ORACLE
+
 create or replace PROCEDURE PROC_DIARIAS
 IS
 CURSOR CUR_DIARIAS
