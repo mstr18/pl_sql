@@ -1,0 +1,479 @@
+create or replace PROCEDURE PROC_ATUALIZA_MATRIZ_CC
+IS
+
+CURSOR CUR_OCUPACAO_CC
+     IS
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'UNIMED') CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 4131
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'SUS') CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 494
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL 
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'SULAMERICA') CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 31
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL 
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')    
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'POSTAL SAUDE') CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 4113
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL 
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'PETROBRAS') CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 26
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'PARTICULAR') CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 25
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL 
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'PACOTE') CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 592
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'MEDISERVICE') CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 24
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL 
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'MEDICINA OCUPACIONAL') CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 3087
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'IPALERJ') CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 476
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'INTERMEDICA') CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 1051
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'GOLDEN CROSS') CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 20
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'FUSMA') CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 5383
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'FURNAS') CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 17
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'CORPO DE BOMBEIROS') CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 2879
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'CEF')CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 1151
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'CAMARJ')CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 934
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL 
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'CAC')CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 10
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'BRADESCO')CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 27
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL 
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'BR DISTRIBUIDORA')CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 1678
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'ASSIM')CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 7
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL 
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+)
+
+
+UNION
+
+
+SELECT CASE WHEN CONV LIKE 0 THEN 0 ELSE QTD END PACIENTE_DIA, REPLACE(CONV, 0, 'AMIL')CONVENIO, CODGERAL, DESCRICAO, CODIGO, SYSDATE DATA_GERACAO FROM(
+    
+    SELECT COUNT(lt.codleito) QTD, NVL(CONV.SIGLA, 0) CONV, conv.codgeral,  CC.DESCRICAO, CC.CODIGO
+    FROM szatendimento atd
+    LEFT JOIN szleito lt ON atd.codleito = lt.codleito 
+    LEFT JOIN szcadgeral conv ON conv.codgeral = atd.codcomprador AND atd.codcomprador = 5
+    LEFT JOIN szcentrocusto cc ON cc.codigo = lt.codcencustos AND cc.naoexibir = 'F' AND cc.codigo IN (select DISTINCT  CC.CODIGO from szleito LT
+                                                                                                            LEFT JOIN SZCENTROCUSTO CC ON CC.CODIGO = LT.CODCENCUSTOS
+                                                                                                            where statusleito like 'O')
+    
+    WHERE atd.datasaida IS NULL 
+    AND  (LT.STATUSLEITO LIKE 'O' AND LT.NROLEITO NOT LIKE '%ALC%'  AND LT.NROLEITO NOT LIKE '%RPA%' AND LT.NROLEITO NOT LIKE '%MAC%'  
+    AND LT.BLOQLEITO NOT LIKE '%S%' AND LT.BLOQLEITO NOT LIKE '%I%' AND LT.NROLEITO NOT LIKE '%DAY%' AND LT.NROLEITO NOT LIKE '%PPP%' AND LT.NROLEITO NOT LIKE '%VIR%')
+    AND (atd.statusconta IS NULL OR atd.statusconta <> 'C')
+    GROUP BY CONV.SIGLA, conv.codgeral, CC.DESCRICAO, CC.CODIGO
+);
+
+
+LINHA_OCUPACAO_CC CUR_OCUPACAO_CC%Rowtype;
+
+
+BEGIN
+
+    delete from T_MATRIZ_CC_CENSO where TO_DATE(DATA_GERACAO) = TO_DATE(SYSDATE);
+
+    OPEN CUR_OCUPACAO_CC;
+
+    LOOP
+        FETCH CUR_OCUPACAO_CC into LINHA_OCUPACAO_CC;
+        EXIT WHEN CUR_OCUPACAO_CC%NOTFOUND;
+        INSERT INTO RM.T_MATRIZ_CC_CENSO VALUES (LINHA_OCUPACAO_CC.PACIENTE_DIA, LINHA_OCUPACAO_CC.CONVENIO, LINHA_OCUPACAO_CC.CODGERAL, LINHA_OCUPACAO_CC.DESCRICAO, LINHA_OCUPACAO_CC.CODIGO, LINHA_OCUPACAO_CC.DATA_GERACAO);
+
+     END LOOP;
+    COMMIT;
+
+END PROC_ATUALIZA_MATRIZ_CC;
+
