@@ -1,0 +1,426 @@
+create or replace PROCEDURE PROC_AVAL_PERFORMANCE AS
+  v_inicio TIMESTAMP;
+  v_fim TIMESTAMP;
+  v_aux VARCHAR(300);
+BEGIN
+  -- Início da execução DA CONSULTA 1
+  v_inicio := SYSTIMESTAMP;
+
+  -- CONSULTA 1 - CENTRO CIRURGICO
+  BEGIN
+    SELECT pac.nomepaciente INTO v_aux
+    FROM   szreginfcirurgia cir
+    INNER JOIN szreginfcirurgiaproc proc
+      ON   cir.seqinfcirurgia = proc.seqinfcirurgia
+    INNER JOIN szatendimento atd
+      ON   atd.numeroconta = cir.numeroconta
+      AND  atd.sequencialconta = cir.sequencialconta
+    INNER JOIN szpaciente pac
+      ON   pac.codpaciente = atd.codpaciente
+    WHERE  proc.codigosus = '0407030034'
+    AND    ROWNUM = 1; -- Adicionado para garantir apenas um resultado
+
+    -- Armazenar o resultado em uma variável ou fazer qualquer outro tratamento necessário
+
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      v_aux := NULL; -- Tratamento para "no data found"
+  END;
+
+  -- Fim da execução
+  v_fim := SYSTIMESTAMP;
+
+  -- Armazenar o início e o fim da execução em uma tabela de registro
+  INSERT INTO TBL_PROC_AVAL_PERFORMANCE (DESCRICAO, INICIO_EXECUCAO, FIM_EXECUCAO, SEGUNDOS) VALUES ('SQL 1 - CENTRO CIRURGICO', v_inicio, v_fim, EXTRACT(SECOND FROM (v_fim - v_inicio)));
+
+  COMMIT; -- FIM DA EXECUÇÃO DA PRIMEIRA CONSULTA
+
+  -- Início da execução DA CONSULTA 2
+  v_inicio := SYSTIMESTAMP;
+
+  /* CONSULTA 2 - VERIFICA OS EXAMES SOLICITADOS AO SETOR LABORATORIAL - LABORATORIO */
+  BEGIN
+    SELECT 
+      pac.nomepaciente INTO v_aux
+    FROM szatendimento atd
+    INNER JOIN rm.szpedexame exame
+      ON atd.numeroconta = exame.numeroconta
+      AND atd.sequencialconta = exame.sequencialconta
+      AND exame.codcoligada = atd.codcoligada
+    INNER JOIN rm.szpedexameitem exameitem
+      ON exame.ordemservico = exameitem.ordemservico
+      AND exameitem.codcoligada = atd.codcoligada
+    INNER JOIN rm.szlabexame lab
+      ON exameitem.codexame = lab.codexame
+      AND exameitem.codcoligada = lab.codcoligada
+    INNER JOIN rm.szexamexsus bpalanc
+      ON bpalanc.codexame = lab.codexame
+      AND bpalanc.codcoligada = lab.codcoligada
+    INNER JOIN rm.szsusprocedimento proced
+      ON bpalanc.codigosus = proced.codproc
+      AND proced.codcoligada = atd.codcoligada
+    INNER JOIN (
+      SELECT ordemservico, codexame, MAX(sequencial) maximo
+      FROM rm.szhistoricostatus
+      WHERE status IN ('I', 'D', 'C', 'R', 'L', 'E')
+      GROUP BY ordemservico, codexame
+    ) maximo
+      ON maximo.ordemservico = exame.ordemservico
+      AND maximo.codexame = exameitem.codexame
+    INNER JOIN rm.szhistoricostatus histstatus
+      ON histstatus.ordemservico = exame.ordemservico
+      AND histstatus.codexame = exameitem.codexame
+      AND maximo.maximo = histstatus.sequencial
+    INNER JOIN rm.szcadgeral cad
+      ON atd.codcomprador = cad.codgeral
+      AND cad.codcoligada = atd.codcoligada
+    INNER JOIN rm.szcadgeral cadd
+      ON atd.codmedrequisitante = cadd.codgeral
+      AND cadd.codcoligada = atd.codcoligada
+    INNER JOIN rm.szprocedencia p
+      ON p.codprocedencias = atd.codprocedencias
+      AND p.codcoligada = atd.codcoligada
+    INNER JOIN rm.szunidatend unid
+      ON unid.idunidatend = atd.idunidatend
+      AND unid.codcoligada = atd.codcoligada
+    INNER JOIN rm.szpaciente pac
+      ON pac.codpaciente = atd.codpaciente
+      AND pac.codcoligada = atd.codcoligada
+    INNER JOIN rm.szespecialidade espec
+      ON espec.codespecgrupo = atd.codespecgrupo
+    INNER JOIN rm.szunidatend ul
+      ON ul.idunidatend = exame.idunidatend
+      AND ul.codcoligada = atd.codcoligada
+    INNER JOIN rm.szleito let
+      ON let.codleito = atd.codleito
+      AND let.codcoligada = atd.codcoligada
+    INNER JOIN rm.szcentrocusto cc
+      ON let.codcencustos = cc.codigo
+      AND let.codcoligada = cc.codcoligada
+    INNER JOIN rm.szrnacompanhante rn
+      ON pac.codcoligada = rn.codcoligada
+      AND atd.codpaciente = rn.codpacientemae
+      AND atd.codatendimento = rn.codatendimentomae 
+    WHERE TO_CHAR(exameitem.datacoleta, 'DD/MM/YYYY') BETWEEN '01/01/2023' AND '01/02/2023'
+      AND exameitem.datacoleta IS NOT NULL
+      AND lab.idunidatend = 17
+      AND exame.cancelado = 'F'
+      AND exameitem.status <> 'X'
+      AND atd.codcoligada = 1
+      AND atd.codcomprador IN ('494', '3087')
+    AND ROWNUM = 1; -- Adicionado para garantir apenas um resultado
+
+    -- Armazenar o resultado em uma variável ou fazer qualquer outro tratamento necessário
+
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      v_aux := NULL; -- Tratamento para "no data found"
+  END;
+
+  -- Fim da execução
+  v_fim := SYSTIMESTAMP;
+
+  -- Armazenar o início e o fim da execução em uma tabela de registro
+  INSERT INTO TBL_PROC_AVAL_PERFORMANCE (DESCRICAO, INICIO_EXECUCAO, FIM_EXECUCAO, SEGUNDOS) VALUES ('SQL 2 - EXAMES LABORATORIAIS', v_inicio, v_fim, EXTRACT(SECOND FROM (v_fim - v_inicio)));
+
+  COMMIT; -- FIM DA EXECUÇÃO DA SEGUNDA CONSULTA
+
+  -- Início da execução DA CONSULTA 3
+  v_inicio := SYSTIMESTAMP;
+
+  /* CONSULTA 3 - VERIFICA OS EXAMES LIBERADOS AOS SETORES - EXAMES DE IMAGEM */
+  BEGIN
+    SELECT pe.ordemservico INTO v_aux
+    FROM szatendimento atd
+    INNER JOIN szpaciente pac
+      ON pac.codcoligada = atd.codcoligada
+      AND pac.codpaciente = atd.codpaciente
+    INNER JOIN szpedexame pe
+      ON pe.codcoligada = atd.codcoligada
+      AND pe.numeroconta = atd.numeroconta
+      AND pe.sequencialconta = atd.sequencialconta
+    INNER JOIN szpedexameitem pei
+      ON pei.ordemservico = pe.ordemservico
+      AND pei.codcoligada = pe.codcoligada
+    INNER JOIN szlabexame lex
+      ON lex.codexame = pei.codexame
+      AND lex.codcoligada = pei.codcoligada
+    LEFT JOIN szcadgeral cad
+      ON cad.codgeral = atd.codcomprador
+    INNER JOIN szhistoricostatus he
+      ON he.codcoligada = pei.codcoligada
+      AND he.ordemservico = pei.ordemservico
+      AND he.codexame = pei.codexame
+      AND he.seqexame = pei.seqexame
+    INNER JOIN szunidatend und
+      ON und.codcoligada = atd.codcoligada
+      AND und.idunidatend = atd.idunidatend
+    WHERE lex.idunidatend = 17
+      AND pei.status = 'L'
+      AND he.status = 'L'
+      AND TO_DATE(SUBSTR(he.datagravacao, 1, 10), 'DD/MM/YYYY') BETWEEN TO_DATE('01/02/23', 'DD/MM/YY') AND TO_DATE('01/03/23', 'DD/MM/YY')
+      AND pei.recmodifiedon IS NOT NULL
+    AND ROWNUM = 1; -- Adicionado para garantir apenas um resultado
+
+    -- Armazenar o resultado em uma variável ou fazer qualquer outro tratamento necessário
+
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      v_aux := NULL; -- Tratamento para "no data found"
+  END;
+
+  -- Fim da execução
+  v_fim := SYSTIMESTAMP;
+
+  -- Armazenar o início e o fim da execução em uma tabela de registro
+  INSERT INTO TBL_PROC_AVAL_PERFORMANCE (DESCRICAO, INICIO_EXECUCAO, FIM_EXECUCAO, SEGUNDOS) VALUES ('SQL 3 - EXAMES DE IMAGEM', v_inicio, v_fim, EXTRACT(SECOND FROM (v_fim - v_inicio)));
+
+  COMMIT; -- FIM DA EXECUÇÃO DA TERCEIRA CONSULTA
+
+  -- Início da execução DA CONSULTA 4
+  v_inicio := SYSTIMESTAMP;
+
+  /* CONSULTA 4 - VERIFICA O ESTOQUE DA FARMÁCIA - FARMACIA */
+  BEGIN
+    SELECT
+      tri.descr INTO v_aux
+    FROM (
+      SELECT
+        c.descricao descr,
+        c.saldogeralfisico saldo,
+        c.customedio cmedio,
+        b.precounitario punitario,
+        CASE EXTRACT(MONTH FROM a.dataemissao)
+          WHEN 1 THEN b.quantidade
+          ELSE 0
+        END jan,
+        CASE EXTRACT(MONTH FROM a.dataemissao)
+          WHEN 2 THEN b.quantidade
+          ELSE 0
+        END fev,
+        CASE EXTRACT(MONTH FROM a.dataemissao)
+          WHEN 3 THEN b.quantidade
+          ELSE 0
+        END mar,
+        CASE EXTRACT(MONTH FROM a.dataemissao)
+          WHEN 4 THEN b.quantidade
+          ELSE 0
+        END abr,
+        CASE EXTRACT(MONTH FROM a.dataemissao)
+          WHEN 5 THEN b.quantidade
+          ELSE 0
+        END mai,
+        CASE EXTRACT(MONTH FROM a.dataemissao)
+          WHEN 6 THEN b.quantidade
+          ELSE 0
+        END jun,
+        CASE EXTRACT(MONTH FROM a.dataemissao)
+          WHEN 7 THEN b.quantidade
+          ELSE 0
+        END jul,
+        CASE EXTRACT(MONTH FROM a.dataemissao)
+          WHEN 8 THEN b.quantidade
+          ELSE 0
+        END ago,
+        CASE EXTRACT(MONTH FROM a.dataemissao)
+          WHEN 9 THEN b.quantidade
+          ELSE 0
+        END sett,
+        CASE EXTRACT(MONTH FROM a.dataemissao)
+          WHEN 10 THEN b.quantidade
+          ELSE 0
+        END outt,
+        CASE EXTRACT(MONTH FROM a.dataemissao)
+          WHEN 11 THEN b.quantidade
+          ELSE 0
+        END nov,
+        CASE EXTRACT(MONTH FROM a.dataemissao)
+          WHEN 12 THEN b.quantidade
+          ELSE 0
+        END dez,
+        (
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 1 THEN b.quantidade
+            ELSE 0
+          END +
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 2 THEN b.quantidade
+            ELSE 0
+          END +
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 3 THEN b.quantidade
+            ELSE 0
+          END
+        ) totalqtde1,
+        (
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 4 THEN b.quantidade
+            ELSE 0
+          END +
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 5 THEN b.quantidade
+            ELSE 0
+          END +
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 6 THEN b.quantidade
+            ELSE 0
+          END
+        ) totalqtde2,
+        (
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 7 THEN b.quantidade
+            ELSE 0
+          END +
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 8 THEN b.quantidade
+            ELSE 0
+          END +
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 9 THEN b.quantidade
+            ELSE 0
+          END
+        ) totalqtde3,
+        (
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 10 THEN b.quantidade
+            ELSE 0
+          END +
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 11 THEN b.quantidade
+            ELSE 0
+          END +
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 12 THEN b.quantidade
+            ELSE 0
+          END
+        ) totalqtde4,
+        (
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 1 THEN b.precounitario * b.quantidade
+            ELSE 0
+          END +
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 2 THEN b.precounitario * b.quantidade
+            ELSE 0
+          END +
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 3 THEN b.precounitario * b.quantidade
+            ELSE 0
+          END
+        ) totalcusto1,
+        (
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 4 THEN b.precounitario * b.quantidade
+            ELSE 0
+          END +
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 5 THEN b.precounitario * b.quantidade
+            ELSE 0
+          END +
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 6 THEN b.precounitario * b.quantidade
+            ELSE 0
+          END
+        ) totalcusto2,
+        (
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 7 THEN b.precounitario * b.quantidade
+            ELSE 0
+          END +
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 8 THEN b.precounitario * b.quantidade
+            ELSE 0
+          END +
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 9 THEN b.precounitario * b.quantidade
+            ELSE 0
+          END
+        ) totalcusto3,
+        (
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 10 THEN b.precounitario * b.quantidade
+            ELSE 0
+          END +
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 11 THEN b.precounitario * b.quantidade
+            ELSE 0
+          END +
+          CASE EXTRACT(MONTH FROM a.dataemissao)
+            WHEN 12 THEN b.precounitario * b.quantidade
+            ELSE 0
+          END
+        ) totalcusto4
+      FROM
+        tmov a,
+        titmmov b,
+        tprd c
+      WHERE
+        a.idmov = b.idmov
+        AND a.codtmv = '1.1.00'
+        AND c.idprd = b.idprd
+        AND a.codloc = '03.001'
+        AND EXTRACT(YEAR FROM a.dataemissao) = '2023'
+    ) tri
+    WHERE  ROWNUM = 1 -- Adicionado para garantir apenas um resultado
+    GROUP BY tri.descr, tri.saldo, tri.cmedio
+    ORDER BY tri.descr;
+
+    -- Armazenar o resultado em uma variável ou fazer qualquer outro tratamento necessário
+
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      v_aux := NULL; -- Tratamento para "no data found"
+  END;
+
+  -- Fim da execução
+  v_fim := SYSTIMESTAMP;
+
+  -- Armazenar o início e o fim da execução em uma tabela de registro
+  INSERT INTO TBL_PROC_AVAL_PERFORMANCE (DESCRICAO, INICIO_EXECUCAO, FIM_EXECUCAO, SEGUNDOS) VALUES ('SQL 4 - FARMACIA', v_inicio, v_fim, EXTRACT(SECOND FROM (v_fim - v_inicio)));
+
+  COMMIT; -- FIM DA EXECUÇÃO DA QUARTA CONSULTA
+
+  -- Início da execução DA CONSULTA 5 - FATURAMENTO
+  v_inicio := SYSTIMESTAMP;
+
+  -- CONSULTA 5
+  BEGIN
+    SELECT a.codprestador INTO v_aux
+    FROM szatendimento b
+    INNER JOIN szpaciente c
+      ON c.codcoligada = b.codcoligada
+      AND c.codpaciente = b.codpaciente
+    INNER JOIN szparcialatend d
+      ON d.codcoligada = b.codcoligada
+      AND d.numeroconta = b.numeroconta
+      AND d.sequencialconta = b.sequencialconta
+    INNER JOIN savw004 a
+      ON a.codcoligada = b.codcoligada
+      AND a.numeroconta = b.numeroconta
+      AND a.sequencialconta = b.sequencialconta
+      AND a.codcoligada = d.codcoligada
+      AND a.numeroconta = d.numeroconta
+      AND a.sequencialconta = d.sequencialconta
+      AND a.seqparcial = d.seqparcial
+    WHERE a.codcoligada = 1
+      AND (a.codcomprador = 4131 AND (a.codgrupo IS NULL OR a.codgrupo = 0))
+      AND a.datalanc >= TO_DATE('01/01/2023', 'DD/MM/YYYY')
+      AND a.datalanc < TO_DATE('31/01/2023', 'DD/MM/YYYY')
+    AND ROWNUM = 1; -- Adicionado para garantir apenas um resultado
+
+    -- Armazenar o resultado em uma variável ou fazer qualquer outro tratamento necessário
+
+  EXCEPTION
+    WHEN NO_DATA_FOUND THEN
+      v_aux := NULL; -- Tratamento para "no data found"
+  END;
+
+  -- Fim da execução
+  v_fim := SYSTIMESTAMP;
+
+  -- Armazenar o início e o fim da execução em uma tabela de registro
+  INSERT INTO TBL_PROC_AVAL_PERFORMANCE (DESCRICAO, INICIO_EXECUCAO, FIM_EXECUCAO, SEGUNDOS) VALUES ('SQL 5 - FATURAMENTO', v_inicio, v_fim, EXTRACT(SECOND FROM (v_fim - v_inicio)));
+
+  COMMIT; -- FIM DA EXECUÇÃO DA QUINTA CONSULTA
+
+END;
